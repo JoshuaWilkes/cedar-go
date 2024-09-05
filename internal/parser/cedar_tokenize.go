@@ -10,6 +10,7 @@ import (
 
 	"github.com/cedar-policy/cedar-go/internal/ast"
 	"github.com/cedar-policy/cedar-go/internal/rust"
+	"github.com/cedar-policy/cedar-go/parsererror"
 )
 
 //go:generate moq -pkg parser -fmt goimports -out tokenize_mocks_test.go . reader
@@ -246,7 +247,7 @@ func (s *scanner) next() rune {
 
 func (s *scanner) error(msg string) {
 	s.tokEnd = s.srcPos - s.lastCharLen // make sure token text is terminated
-	s.err = fmt.Errorf("%v: %v", s.position, msg)
+	s.err = parsererror.PositionalError{Position: ast.Position(s.position), Message: msg}
 }
 
 func isASCIILetter(ch rune) bool {
